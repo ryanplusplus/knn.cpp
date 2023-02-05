@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "compileCommands": ".vscode/compile_commands.json",
+            "intelliSenseMode": "linux-gcc-x64",
+            "cStandard": "c17"
+        }
+    ],
+    "version": 4
+}
