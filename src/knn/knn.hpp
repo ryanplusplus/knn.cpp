@@ -9,30 +9,37 @@
 namespace knn {
   using namespace std;
 
-  template <typename Classification, typename Neighbors, typename Value, typename DistanceCalculator>
-  Classification classify(const Neighbors& neighbors, int k, const Value& value, DistanceCalculator distance)
+  template <
+    typename NeighborIterator,
+    typename Value,
+    typename DistanceCalculator>
+  auto classify(
+    const Value& value,
+    int k,
+    const NeighborIterator& firstNeighbor,
+    const NeighborIterator& lastNeighbor,
+    DistanceCalculator distance)
+    -> decltype(firstNeighbor->first)
   {
-    auto distances = vector<pair<Classification, int>>{};
-
-    for(auto neighbor : neighbors) {
-      distances.emplace_back(neighbor.first, distance(neighbor.second, value));
+    auto distances = vector<pair<decltype(firstNeighbor->first), int>>{};
+    for(auto neighbor = firstNeighbor; neighbor != lastNeighbor; ++neighbor) {
+      distances.emplace_back(neighbor->first, distance(neighbor->second, value));
     }
 
     sort(distances.begin(), distances.end(), [](const auto& lhs, const auto& rhs) {
       return lhs.second < rhs.second;
     });
 
-    auto votes = map<Classification, int>();
+    auto votes = map<decltype(firstNeighbor->first), int>();
     auto it = distances.begin();
     for(auto i = 0; i < k; ++i) {
       ++votes[(*it).first];
       ++it;
     }
 
-    return (*max_element(votes.begin(), votes.end(), [](const auto& lhs, const auto& rhs) {
+    return max_element(votes.begin(), votes.end(), [](const auto& lhs, const auto& rhs) {
       return lhs.second < rhs.second;
-    }))
-      .first;
+    })->first;
   }
 }
 
